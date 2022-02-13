@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "/;pb";
+
+message Empty{}
+
+message YakitPlugin {
+  // github 认证的 Token，可以获取到当前用户信息
+  string AuthToken = 1;
+
+  // 插件名称
+  string PluginName = 2;
+
+  // 插件基础源信息
+  string MetaFile = 3;
+  string Code = 4;
+}
+
+message Token {
+  string AuthToken = 2;
+}
+
+service Online {
+  // Login
+  rpc UserInfo(Token) returns (Empty);
+
+  // 上传
+  rpc UploadPlugin(YakitPlugin) returns (Empty);
+
+}
