@@ -7,7 +7,6 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"online/common/utils"
-	"online/common/yak/yaklib/codec"
 	"reflect"
 	"strings"
 )
@@ -34,7 +33,7 @@ func Encrypt(raw []byte, pemBytes []byte) (string, error) {
 		if err != nil {
 			return "", utils.Errorf("enc sub[%s] failed: %s", sub, err)
 		}
-		enc = append(enc, codec.EncodeToHex(rs))
+		enc = append(enc, utils.EncodeToHex(rs))
 	}
 	return strings.Join(enc, "\n"), nil
 }
@@ -48,14 +47,14 @@ func Decrypt(r string, priPem []byte) ([]byte, error) {
 
 	var groups []string
 	for line := range utils.ParseLines(r) {
-		lRaw, err := codec.DecodeHex(line)
+		lRaw, err := utils.DecodeHex(line)
 		if err != nil {
 			return nil, utils.Errorf("parse hex failed: %s", err)
 		}
 
 		res, err := rsa.DecryptPKCS1v15(cryptorand.Reader, pri, lRaw)
 		if err != nil {
-			return nil, utils.Errorf("dec block[%s] failed: %s", codec.StrConvQuote(string(lRaw)), err)
+			return nil, utils.Errorf("dec block[%s] failed: %s", utils.EncodeToHex(string(lRaw)), err)
 		}
 
 		groups = append(groups, string(res))

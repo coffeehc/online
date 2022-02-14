@@ -3,8 +3,8 @@ package pagination
 import (
 	"github.com/jinzhu/gorm"
 	"math"
-	"palm/server/web/api/webutil"
-	"palm/server/web/gen/models"
+	"online/server/api/webutil"
+	"online/server/web/gen/models"
 )
 
 type Param struct {

@@ -6,7 +6,7 @@ require (
 	github.com/ReneKroon/ttlcache v1.7.0
 	github.com/akutz/memconn v0.1.0
 	github.com/antchfx/xpath v1.2.0
-	github.com/c-bata/go-prompt v0.2.6
+	github.com/c-bata/go-prompt v0.2.6 // indirect
 	github.com/davecgh/go-spew v1.1.1
 	github.com/denisbrodbeck/machineid v1.0.1
 	github.com/dlclark/regexp2 v1.4.0
@@ -21,7 +21,7 @@ require (
 	github.com/gobwas/glob v0.2.3
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da
 	github.com/google/gopacket v1.1.19
-	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510
+	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510 // indirect
 	github.com/google/uuid v1.1.2
 	github.com/gorilla/mux v1.8.0
 	github.com/jessevdk/go-flags v1.5.0
