@@ -76,7 +76,7 @@ func (m *MITMProxy) serve(conn net.Conn) {
 		return
 	}
 
-	packet, err := utils.HttpDumpWithBody(httpRequest, false)
+	packet, err := utils.HttpDumpWithBody(httpRequest, true)
 	if err != nil {
 		log.Errorf("dump packet error: %s", err)
 		return
@@ -84,11 +84,12 @@ func (m *MITMProxy) serve(conn net.Conn) {
 
 	// 如果是 CONNECT 给人家回一个 Established，这种一般是开隧道用的
 	if httpRequest.Method == "CONNECT" {
-		_, err = conn.Write([]byte(`HTTP/1.1 200 Connection Established\r\n\r\n`))
+		_, err = conn.Write([]byte("HTTP/1.1 200 Connection Established\r\n\r\n"))
 		if err != nil {
 			log.Errorf("write CONNECT response to %v failed: %s", conn.RemoteAddr(), err)
 			return
 		}
+		println(string(packet))
 		log.Info("CONNECT response is sent back")
 		m.connect(httpRequest, conn)
 		return
@@ -106,7 +107,7 @@ func (m *MITMProxy) serve(conn net.Conn) {
 			}
 			httpRequest.Header.Del("Proxy-Connection")
 			host := httpRequest.URL.Host
-			newConn, _, err := m.newConnFor(host)
+			newConn, err := m.newConnFor(host, false)
 			if err != nil {
 				log.Errorf("create new conn to %v failed: %s", host, err)
 				return
@@ -177,6 +178,13 @@ func (m *MITMProxy) connect(httpRequest *http.Request, conn net.Conn) {
 	host := httpRequest.URL.Host
 	log.Infof("%v CONNECTed %v start to peek first byte to identify https/tls", conn.RemoteAddr(), host)
 
+	connKeepalive := false
+	if httpRequest.Header.Get("Proxy-Connection") == "keep-alive" {
+		connKeepalive = true
+	}
+	httpRequest.Header.Del("Proxy-Connection")
+	_ = connKeepalive
+
 	originConnPeekable := utils.NewPeekableNetConn(conn)
 	raw, err := originConnPeekable.Peek(1)
 	if err != nil {
@@ -190,12 +198,15 @@ func (m *MITMProxy) connect(httpRequest *http.Request, conn net.Conn) {
 	var sni string
 	switch raw[0] {
 	case 0x16:
-		// HTTPS 升级
+		// HTTPS 升级，这是核心步骤
 		log.Infof("upgrade %v to tls(https)", conn.RemoteAddr())
 		tconn := tls.Server(originConnPeekable, m.config.mitmConfig.TLS())
 		err := tconn.Handshake()
 		if err != nil {
 			log.Errorf("tls handshake failed: %s", err)
+			println(string(m.config.Ca))
+			println("----------------------")
+			println(string(m.config.Key))
 			return
 		}
 		originHttpConn = tconn
@@ -209,19 +220,51 @@ func (m *MITMProxy) connect(httpRequest *http.Request, conn net.Conn) {
 	}
 
 	if isHttps.IsSet() {
-		log.Errorf("MITM Hijacked HTTPS SNI: %v", sni)
+		log.Infof("MITM Hijacked HTTPS SNI: %v", sni)
 	}
 	_ = originHttpConn
 
-	newConn, _, err := m.newConnFor(host)
+	inCome := bufio.NewReader(originHttpConn)
+	newConn, err := m.newConnFor(host, isHttps.IsSet())
 	if err != nil {
 		log.Errorf("create new conn to %v failed: %s", host, err)
 		return
 	}
-	_ = newConn
+	outConn := bufio.NewReader(newConn)
+	first := true
+	for {
+		req, err := http.ReadRequest(inCome)
+		if err != nil {
+			log.Errorf("read request from client [%v] failed: %s", conn.RemoteAddr(), err)
+			return
+		}
+		packet, err := utils.HttpDumpWithBody(req, true)
+		if err != nil {
+			return
+		}
+
+		newConn.Write(packet)
+		rsp, err := http.ReadResponse(outConn, req)
+		if err != nil {
+			return
+		}
+		responsePacket, err := utils.HttpDumpWithBody(rsp, true)
+		if err != nil {
+			return
+		}
+		originHttpConn.Write(responsePacket)
+		if first {
+			first = false
+			if connKeepalive {
+				log.Errorf("close by connection for %v => %v", conn.RemoteAddr(), newConn.RemoteAddr())
+				return
+			}
+		}
+	}
+
 }
 
-func (m *MITMProxy) newConnFor(target string) (net.Conn, bool, error) {
+func (m *MITMProxy) newConnFor(target string, isTls bool) (net.Conn, error) {
 	host, port, err := utils.ParseStringToHostPort(target)
 	if err != nil {
 		host = target
@@ -230,13 +273,23 @@ func (m *MITMProxy) newConnFor(target string) (net.Conn, bool, error) {
 	if !utils.IsIPv4(host) {
 		host = utils.GetFirstIPByDnsWithCache(host, 10*time.Second)
 		if host == "" {
-			return nil, port == 443, utils.Errorf("dns error for %v", host)
+			return nil, utils.Errorf("dns error for %v", host)
 		}
 	}
 
-	conn, err := m.dialer.Dial("tcp", utils.HostPort(host, port))
-	if err != nil {
-		return nil, port == 443, utils.Errorf("dial to new connection %v failed: %s", utils.HostPort(host, port))
+	if !isTls {
+		conn, err := m.dialer.Dial("tcp", utils.HostPort(host, port))
+		if err != nil {
+			return nil, utils.Errorf("dial to new connection %v failed: %s", utils.HostPort(host, port))
+		}
+		return conn, nil
+	} else {
+		conn, err := tls.DialWithDialer(m.dialer, "tcp", utils.HostPort(host, port), &tls.Config{
+			InsecureSkipVerify: true,
+		})
+		if err != nil {
+			return nil, utils.Errorf("dial tls to conn %v failed: %s", utils.HostPort(host, port), err)
+		}
+		return conn, nil
 	}
-	return conn, port == 443, nil
 }
