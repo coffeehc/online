@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"github.com/kataras/golog"
 	"github.com/urfave/cli"
+	"net/http"
+	"net/http/httputil"
 	"online/common/log"
 	"online/mitmproxy"
 	"os"
@@ -101,7 +103,30 @@ func main() {
 
 	app.Action = func(c *cli.Context) error {
 		log.Info("start to startup mitmproxy...")
-		proxy, err := mitmproxy.NewMITMProxy(mitmproxy.WithCaCert(defaultCa, defaultKey))
+		proxy, err := mitmproxy.NewMITMProxy(
+			mitmproxy.WithCaCert(defaultCa, defaultKey),
+			mitmproxy.WithMirrorRequest(func(req *http.Request) {
+				// 在这里劫持所有请求流经代理的请求
+				raw, _ := httputil.DumpRequest(req, true)
+				println(string(raw))
+			}),
+			mitmproxy.WithMirrorResponse(func(req *http.Response) {
+				// 推荐在这里劫持 rad 的流量
+				// 在这里劫持所有流经代理的响应
+				// 请求
+				raw, _ := httputil.DumpResponse(req, true)
+				println(string(raw))
+			}),
+			mitmproxy.WithWebHook(func(req *http.Request) {
+				// 如果把这个代理当成 xray 的 webhook
+				// 可以在这个函数中处理请求
+				println("--------------------------------------------")
+				println("------------- WEBHOOK IS ME ----------------")
+				println("--------------------------------------------")
+				raw, _ := httputil.DumpRequest(req, true)
+				println(string(raw))
+			}),
+		)
 		if err != nil {
 			return err
 		}

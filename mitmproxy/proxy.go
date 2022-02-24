@@ -94,11 +94,15 @@ func (m *MITMProxy) serve(conn net.Conn) {
 		// 如果是带了一个 Proxy-Connection 的话，则说明，这也是一个代理的请求类型。
 		switch strings.ToLower(httpRequest.Header.Get("Proxy-Connection")) {
 		case "":
-			log.Errorf("not a proxy connection from %v", conn.RemoteAddr())
+			// 如果不带这个头，我们暂且认为他是一个 webhook
+			if m.config.webhookCallback != nil {
+				m.config.webhookCallback(httpRequest)
+				conn.Write([]byte("HTTP/1.1 200 Ok\r\nContent-Length: 0\r\n\r\n"))
+			}
 			return
 		default:
 			var keepAlive = false
-			if httpRequest.Header.Get("Proxy-Connection") == "keep-alive" {
+			if strings.ToLower(httpRequest.Header.Get("Proxy-Connection")) == "keep-alive" {
 				keepAlive = true
 			}
 			httpRequest.Header.Del("Proxy-Connection")
@@ -121,11 +125,20 @@ func (m *MITMProxy) serve(conn net.Conn) {
 			var body []byte
 			if httpRequest.Body != nil {
 				body, _ = ioutil.ReadAll(httpRequest.Body)
+				httpRequest.Body = ioutil.NopCloser(bytes.NewBuffer(body))
+			}
+
+			if m.config.mirrorRequestCallback != nil {
+				m.config.mirrorRequestCallback(httpRequest)
 			}
 
 			newConn.Write(headers)
 			newConn.Write(body)
-			err = mirrorResponse(httpRequest, newConn, conn)
+			err = mirrorResponse(httpRequest, newConn, conn, func(r *http.Response) {
+				if m.config.mirrorResponseCallback != nil {
+					m.config.mirrorResponseCallback(r)
+				}
+			})
 			if err != nil {
 				log.Errorf("mirror response failed: %s", err)
 				return
@@ -143,7 +156,7 @@ func (m *MITMProxy) connect(httpRequest *http.Request, conn net.Conn) {
 	host := httpRequest.URL.Host
 	//log.Infof("%v CONNECTed %v start to peek first byte to identify https/tls", conn.RemoteAddr(), host)
 	connKeepalive := false
-	if httpRequest.Header.Get("Proxy-Connection") == "keep-alive" {
+	if strings.ToLower(httpRequest.Header.Get("Proxy-Connection")) == "keep-alive" {
 		connKeepalive = true
 	}
 	httpRequest.Header.Del("Proxy-Connection")
@@ -198,6 +211,10 @@ func (m *MITMProxy) handleHTTP(in net.Conn, out net.Conn, keepalive bool) {
 		var rsp *http.Response
 		err := mirrorRequest(in, out, func(r *http.Request) {
 			req = r
+		}, func(r *http.Request) {
+			if m.config.mirrorRequestCallback != nil {
+				m.config.mirrorRequestCallback(r)
+			}
 		})
 		if err != nil {
 			log.Errorf("mirror request failed: %s", err)
@@ -206,6 +223,10 @@ func (m *MITMProxy) handleHTTP(in net.Conn, out net.Conn, keepalive bool) {
 
 		err = mirrorResponse(req, out, in, func(r *http.Response) {
 			rsp = r
+		}, func(r *http.Response) {
+			if m.config.mirrorResponseCallback != nil {
+				m.config.mirrorResponseCallback(r)
+			}
 		})
 		if err != nil {
 			log.Errorf("mirror response failed: %s", err)

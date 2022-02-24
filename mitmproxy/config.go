@@ -3,6 +3,7 @@ package mitmproxy
 import (
 	"crypto/tls"
 	"crypto/x509"
+	"net/http"
 	"online/common/log"
 	"online/common/utils"
 	"online/common/utils/tlsutils"
@@ -19,9 +20,52 @@ type Config struct {
 	Timeout         time.Duration `json:"timeout"`
 
 	mitmConfig *mitm.Config
+
+	webhookCallback        func(req *http.Request)
+	mirrorRequestCallback  func(req *http.Request)
+	mirrorResponseCallback func(req *http.Response)
 }
 
 type Option func(config *Config)
+
+func WithMirrorRequest(cb func(req *http.Request)) Option {
+	return func(config *Config) {
+		config.mirrorRequestCallback = func(req *http.Request) {
+			defer func() {
+				if err := recover(); err != nil {
+					log.Error(err)
+				}
+			}()
+			cb(req)
+		}
+	}
+}
+
+func WithMirrorResponse(cb func(req *http.Response)) Option {
+	return func(config *Config) {
+		config.mirrorResponseCallback = func(req *http.Response) {
+			defer func() {
+				if err := recover(); err != nil {
+					log.Error(err)
+				}
+			}()
+			cb(req)
+		}
+	}
+}
+
+func WithWebHook(cb func(req *http.Request)) Option {
+	return func(config *Config) {
+		config.webhookCallback = func(req *http.Request) {
+			defer func() {
+				if err := recover(); err != nil {
+					log.Error(err)
+				}
+			}()
+			cb(req)
+		}
+	}
+}
 
 func WithHost(host string) Option {
 	return func(config *Config) {
