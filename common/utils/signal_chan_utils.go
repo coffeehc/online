@@ -1,9 +1,9 @@
 package utils
 
 import (
+	"online/common/log"
 	"os"
 	"os/signal"
-	"online/common/log"
 	"syscall"
 )
 

@@ -13,4 +13,3 @@ func NewRouteWrapper() (Routing, error) {
 	}
 	return NewWindowsRouteWrapper(pathToRouteCommand)
 }
-

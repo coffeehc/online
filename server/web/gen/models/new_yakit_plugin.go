@@ -38,10 +38,6 @@ type NewYakitPlugin struct {
 	// 被修改的次数
 	Forks int64 `json:"forks,omitempty"`
 
-	// hash
-	// Required: true
-	Hash *string `json:"hash"`
-
 	// is official
 	// Required: true
 	IsOfficial *bool `json:"is_official"`
@@ -82,10 +78,6 @@ func (m *NewYakitPlugin) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateDefaultOpen(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateHash(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -140,15 +132,6 @@ func (m *NewYakitPlugin) validateContent(formats strfmt.Registry) error {
 func (m *NewYakitPlugin) validateDefaultOpen(formats strfmt.Registry) error {
 
 	if err := validate.Required("default_open", "body", m.DefaultOpen); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (m *NewYakitPlugin) validateHash(formats strfmt.Registry) error {
-
-	if err := validate.Required("hash", "body", m.Hash); err != nil {
 		return err
 	}
 

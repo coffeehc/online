@@ -37,7 +37,7 @@ var (
 )
 
 func NewDBManager(params string) (*Manager, error) {
-	return NewDBManagerWithMigrate(params, false)
+	return NewDBManagerWithMigrate(params, true)
 }
 
 func NewDBManagerWithMigrate(params string, migrate bool) (*Manager, error) {
@@ -71,7 +71,7 @@ func NewDBManagerWithMigrate(params string, migrate bool) (*Manager, error) {
 func (m *Manager) AutoMigrate() {
 	log.Info("start to migrate models")
 
-	m.DB.AutoMigrate()
+	m.DB.AutoMigrate(&User{}, &Operation{}, &YakitPlugin{})
 	log.Info("migrate all models finished")
 }
 

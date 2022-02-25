@@ -29,3 +29,26 @@ func (a *APIManager) GetYakitPluginTagsHandler() operations.GetYakitPluginTagsHa
 		return nil
 	}
 }
+
+func (a *APIManager) PostYakitPluginTagsHandler() operations.PostYakitPluginTagsHandlerFunc {
+	apiName := "PostYakitPluginTagsHandler"
+	_ = apiName
+	return func(params operations.PostYakitPluginTagsParams, principle *models.Principle) middleware.Responder {
+		return nil
+	}
+}
+
+func (a *APIManager) PostYakitPluginHandler() operations.PostYakitPluginHandlerFunc {
+	apiName := "PostYakitPluginHandler"
+	_ = apiName
+	return func(params operations.PostYakitPluginParams, principle *models.Principle) middleware.Responder {
+		return nil
+	}
+}
+func (a *APIManager) DeleteYakitPluginHandler() operations.DeleteYakitPluginHandlerFunc {
+	apiName := "DeleteYakitPluginHandler"
+	_ = apiName
+	return func(params operations.DeleteYakitPluginParams, principle *models.Principle) middleware.Responder {
+		return nil
+	}
+}

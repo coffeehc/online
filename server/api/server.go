@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"online/common/log"
 	"online/server/dbm"
-	"online/server/web/gen/restapi/operations"
 	"strings"
 
 	"time"
@@ -16,12 +15,6 @@ import (
 type APIManager struct {
 	staticDir string
 	dbManager *dbm.Manager
-}
-
-func (s *APIManager) initAPIBase(apiIf *operations.OnlineAPI) {
-	apiIf.GetYakitPluginHandler = s.GetYakitPluginHandler()
-	apiIf.GetYakitPluginFetchHandler = s.GetYakitPluginFetchHandler()
-	apiIf.GetYakitPluginTagsHandler = s.GetYakitPluginTagsHandler()
 }
 
 func (a *APIManager) HookHTTPMiddleware(handler http.Handler) http.HandlerFunc {

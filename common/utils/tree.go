@@ -65,7 +65,7 @@ func (w *PathForest) getRootNodeOrCreate(s string) (*pathNode, error) {
 	var path string
 	if strings.HasPrefix(s, "/") {
 		path = s
-	}else{
+	} else {
 		path = filepath.Join("/", s)
 	}
 	root := &pathNode{

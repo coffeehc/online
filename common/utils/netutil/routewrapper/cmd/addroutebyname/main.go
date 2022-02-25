@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 	"net"
-	"os"
 	"online/common/utils/netutil/routewrapper"
+	"os"
 )
 
 var progname = os.Args[0]

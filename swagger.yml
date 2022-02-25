@@ -15,7 +15,6 @@ consumes:
 
 produces:
   - application/json
-  - application/octet-stream
 
 securityDefinitions:
   user:
@@ -31,6 +30,125 @@ security:
   - user: [ ]
 
 paths:
+  /auth/from-github/callback:
+    get:
+      security: [ ]
+      parameters:
+        - in: query
+          type: string
+          name: code
+      responses:
+        200:
+          $ref: "#/responses/ActionSucceeded"
+  /auth/from-github:
+    get:
+      security: [ ]
+      parameters: [ ]
+      responses:
+        200:
+          description: "Fetch Github Oauth URL"
+          schema:
+            type: string
+  /user/fetch:
+    get:
+      parameters:
+        - in: query
+          type: integer
+          name: id
+      responses:
+        200:
+          description: "查询 User 记录"
+          schema:
+            $ref: "#/definitions/User"
+  /user:
+    get:
+      security:
+        - trusted: [ ]
+      parameters:
+        - $ref: "#/parameters/Page"
+        - $ref: "#/parameters/Order"
+        - $ref: "#/parameters/Limit"
+        - $ref: "#/parameters/OrderBy"
+        - in: query
+          type: string
+          name: name
+      responses:
+        200:
+          description: "查询 User 记录"
+          schema:
+            $ref: "#/definitions/UsersResponse"
+    delete:
+      security:
+        - trusted: [ ]
+      parameters:
+        - in: query
+          name: id
+          type: integer
+      responses:
+        200:
+          $ref: "#/responses/ActionSucceeded"
+  /user/tags:
+    get:
+      parameters: [ ]
+      responses:
+        200:
+          description: "查询 /user  所有的Tags"
+          schema:
+            type: array
+            items:
+              type: string
+    post:
+      parameters:
+        - in: query
+          type: integer
+          name: id
+          required: true
+        - in: query
+          type: string
+          enum:
+            - add
+            - set
+          name: op
+        - in: query
+          type: array
+          items:
+            type: string
+          name: tags
+      responses:
+        200:
+          $ref: "#/responses/ActionSucceeded"
+  /operation:
+    get:
+      parameters:
+        - $ref: "#/parameters/Page"
+        - $ref: "#/parameters/Order"
+        - $ref: "#/parameters/Limit"
+        - $ref: "#/parameters/OrderBy"
+        - in: query
+          type: string
+          name: name
+      responses:
+        200:
+          description: "查询 Operation 记录"
+          schema:
+            $ref: "#/definitions/OperationsResponse"
+    post:
+      parameters:
+        - in: body
+          name: Data
+          schema:
+            $ref: "#/definitions/NewOperation"
+      responses:
+        200:
+          $ref: "#/responses/ActionSucceeded"
+    delete:
+      parameters:
+        - in: query
+          name: id
+          type: integer
+      responses:
+        200:
+          $ref: "#/responses/ActionSucceeded"
   /yakit/plugin/fetch:
     get:
       parameters:
@@ -140,6 +258,72 @@ parameters:
       - desc
 
 definitions:
+  UsersResponse:
+    allOf:
+      - $ref: "#/definitions/Paging"
+    required:
+      - data
+    properties:
+      data:
+        type: array
+        items:
+          $ref: "#/definitions/User"
+  User:
+    allOf:
+      - $ref: "#/definitions/GormBaseModel"
+      - $ref: "#/definitions/NewUser"
+  NewUser:
+    type: object
+    required:
+      - uesr_unique_id
+      - user_verbose
+      - from_platform
+      - trusted
+      - tags
+    properties:
+      tags:
+        type: array
+        items:
+          type: string
+      uesr_unique_id:
+        type: string
+      user_verbose:
+        type: string
+      from_platform:
+        type: string
+      trusted:
+        type: boolean
+      email:
+        type: string
+  OperationsResponse:
+    allOf:
+      - $ref: "#/definitions/Paging"
+    required:
+      - data
+    properties:
+      data:
+        type: array
+        items:
+          $ref: "#/definitions/Operation"
+  Operation:
+    allOf:
+      - $ref: "#/definitions/GormBaseModel"
+      - $ref: "#/definitions/NewOperation"
+  NewOperation:
+    type: object
+    required:
+      - type
+      - trigger_user_unique_id
+      - operation_plugin_id
+    properties:
+      type:
+        type: string
+      trigger_user_unique_id:
+        type: string
+      operation_plugin_id:
+        type: string
+      extra:
+        type: string
   YakitPluginsResponse:
     allOf:
       - $ref: "#/definitions/Paging"
@@ -181,7 +365,6 @@ definitions:
       - authors
       - content
       - published_at
-      - hash
       - tags
       - is_official
       - default_open
@@ -194,8 +377,6 @@ definitions:
         type: array
         items:
           type: string
-      hash:
-        type: string
       params:
         type: array
         items:

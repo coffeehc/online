@@ -6,7 +6,6 @@ import (
 	"os/exec"
 )
 
-
 func NewRouteWrapper() (Routing, error) {
 	pathToNetstatCommand, err := exec.LookPath("netstat")
 	if err != nil {

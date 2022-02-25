@@ -69,7 +69,7 @@ func GetCurrentWeekMonday() (time.Time, error) {
 		return time.Time{}, Errorf("BUG: parse current date failed: %s", err)
 	}
 
-	return nowDate.Add(- time.Duration(weekdayToOffsetWithMondayFirst(nowDate.Weekday())) * 24 * time.Hour), nil
+	return nowDate.Add(-time.Duration(weekdayToOffsetWithMondayFirst(nowDate.Weekday())) * 24 * time.Hour), nil
 }
 
 func GetWeekStartMonday(t time.Time) (time.Time, error) {
@@ -78,7 +78,7 @@ func GetWeekStartMonday(t time.Time) (time.Time, error) {
 		return time.Time{}, Errorf("BUG: parse current date failed: %s", err)
 	}
 
-	result := nowDate.Add(- time.Duration(weekdayToOffsetWithMondayFirst(nowDate.Weekday())) * 24 * time.Hour)
+	result := nowDate.Add(-time.Duration(weekdayToOffsetWithMondayFirst(nowDate.Weekday())) * 24 * time.Hour)
 	if result.Weekday() != time.Monday {
 	}
 	return result, nil
@@ -90,7 +90,7 @@ func GetWeekStartSunday() (time.Time, error) {
 		return time.Time{}, Errorf("BUG: parse current date failed: %s", err)
 	}
 
-	return nowDate.Add(- time.Duration(weekdayToOffsetWithSundayFirst(nowDate.Weekday())) * 24 * time.Hour), nil
+	return nowDate.Add(-time.Duration(weekdayToOffsetWithSundayFirst(nowDate.Weekday())) * 24 * time.Hour), nil
 }
 
 func TickEvery1s(falseToBreak func() bool) {

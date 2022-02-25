@@ -146,7 +146,7 @@ func (j *HTTPPacketFilter) SetAllowForResponseRaw(regexp string) {
 	j.addFilter(httpFilter_ResponseRaw, regexp, "", httpFilterAction_Allow)
 }
 
-func (j *HTTPPacketFilter) SetRejectForRequestPath(regexp string, ) {
+func (j *HTTPPacketFilter) SetRejectForRequestPath(regexp string) {
 	j.addFilter(httpFilter_RequestPath, regexp, "", httpFilterAction_Reject)
 }
 

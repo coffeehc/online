@@ -20,7 +20,6 @@ func TestMatchAllOfGlob(t *testing.T) {
 	test.True(MatchAnyOfRegexp("asdfGET/HTTP Set-Cookie: rememberMe=deleteMe;", "rememberMe=*", "*=deleteMe;"))
 	test.False(MatchAnyOfRegexp("asdfGET/HTTP Set-Cookie: rememberMe=deleteMe;", "rememberMeahsiodjkoasdfjklasdfk=*", "*=deletasdnklfhjnklasdfjklasdfeMe;"))
 
-
 	test.False(MatchAllOfSubString("asdfGET/HTTP Set-Cookie: rememberMe=deleteMe;", "rememberMe=.*", ".*=deleteMe;"))
 	test.True(MatchAllOfSubString("asdfGET/HTTP Set-Cookie: rememberMe=deleteMe;", "rememberMe=", "=deleteMe;"))
 	test.False(MatchAllOfSubString("asdfGET/HTTP Set-Cookie: rememberMe=deleteMe;", "rememberMe=.*", ".*=deleteMe;", "asdfhasdfjklajskldfjopasdfop"))

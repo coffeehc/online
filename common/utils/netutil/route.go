@@ -6,11 +6,11 @@ import (
 	"github.com/google/gopacket/routing"
 	"github.com/pkg/errors"
 	"net"
-	"os/exec"
 	"online/common/log"
 	"online/common/utils"
 	"online/common/utils/netutil/netroute"
 	"online/common/utils/netutil/routewrapper"
+	"os/exec"
 	"runtime"
 	"time"
 )

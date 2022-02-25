@@ -1,6 +1,5 @@
 package arptable
 
-
 import (
 	"sync"
 	"time"

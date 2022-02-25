@@ -22,8 +22,7 @@ func init() {
     "application/json"
   ],
   "produces": [
-    "application/json",
-    "application/octet-stream"
+    "application/json"
   ],
   "schemes": [
     "http"
@@ -36,6 +35,218 @@ func init() {
   },
   "basePath": "/api",
   "paths": {
+    "/auth/from-github": {
+      "get": {
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Fetch Github Oauth URL",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "/auth/from-github/callback": {
+      "get": {
+        "security": [],
+        "parameters": [
+          {
+            "type": "string",
+            "name": "code",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/ActionSucceeded"
+          }
+        }
+      }
+    },
+    "/operation": {
+      "get": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/Page"
+          },
+          {
+            "$ref": "#/parameters/Order"
+          },
+          {
+            "$ref": "#/parameters/Limit"
+          },
+          {
+            "$ref": "#/parameters/OrderBy"
+          },
+          {
+            "type": "string",
+            "name": "name",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "查询 Operation 记录",
+            "schema": {
+              "$ref": "#/definitions/OperationsResponse"
+            }
+          }
+        }
+      },
+      "post": {
+        "parameters": [
+          {
+            "name": "Data",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/NewOperation"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/ActionSucceeded"
+          }
+        }
+      },
+      "delete": {
+        "parameters": [
+          {
+            "type": "integer",
+            "name": "id",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/ActionSucceeded"
+          }
+        }
+      }
+    },
+    "/user": {
+      "get": {
+        "security": [
+          {
+            "trusted": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/parameters/Page"
+          },
+          {
+            "$ref": "#/parameters/Order"
+          },
+          {
+            "$ref": "#/parameters/Limit"
+          },
+          {
+            "$ref": "#/parameters/OrderBy"
+          },
+          {
+            "type": "string",
+            "name": "name",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "查询 User 记录",
+            "schema": {
+              "$ref": "#/definitions/UsersResponse"
+            }
+          }
+        }
+      },
+      "delete": {
+        "security": [
+          {
+            "trusted": []
+          }
+        ],
+        "parameters": [
+          {
+            "type": "integer",
+            "name": "id",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/ActionSucceeded"
+          }
+        }
+      }
+    },
+    "/user/fetch": {
+      "get": {
+        "parameters": [
+          {
+            "type": "integer",
+            "name": "id",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "查询 User 记录",
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          }
+        }
+      }
+    },
+    "/user/tags": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "查询 /user  所有的Tags",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "parameters": [
+          {
+            "type": "integer",
+            "name": "id",
+            "in": "query",
+            "required": true
+          },
+          {
+            "enum": [
+              "add",
+              "set"
+            ],
+            "type": "string",
+            "name": "op",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "name": "tags",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/ActionSucceeded"
+          }
+        }
+      }
+    },
     "/yakit/plugin": {
       "get": {
         "parameters": [
@@ -222,6 +433,61 @@ func init() {
         }
       }
     },
+    "NewOperation": {
+      "type": "object",
+      "required": [
+        "type",
+        "trigger_user_unique_id",
+        "operation_plugin_id"
+      ],
+      "properties": {
+        "extra": {
+          "type": "string"
+        },
+        "operation_plugin_id": {
+          "type": "string"
+        },
+        "trigger_user_unique_id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      }
+    },
+    "NewUser": {
+      "type": "object",
+      "required": [
+        "uesr_unique_id",
+        "user_verbose",
+        "from_platform",
+        "trusted",
+        "tags"
+      ],
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "from_platform": {
+          "type": "string"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "trusted": {
+          "type": "boolean"
+        },
+        "uesr_unique_id": {
+          "type": "string"
+        },
+        "user_verbose": {
+          "type": "string"
+        }
+      }
+    },
     "NewYakitPlugin": {
       "type": "object",
       "required": [
@@ -230,7 +496,6 @@ func init() {
         "authors",
         "content",
         "published_at",
-        "hash",
         "tags",
         "is_official",
         "default_open"
@@ -255,9 +520,6 @@ func init() {
         "forks": {
           "description": "被修改的次数",
           "type": "integer"
-        },
-        "hash": {
-          "type": "string"
         },
         "is_official": {
           "type": "boolean"
@@ -287,6 +549,34 @@ func init() {
         },
         "type": {
           "type": "string"
+        }
+      }
+    },
+    "Operation": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/GormBaseModel"
+        },
+        {
+          "$ref": "#/definitions/NewOperation"
+        }
+      ]
+    },
+    "OperationsResponse": {
+      "required": [
+        "data"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/definitions/Paging"
+        }
+      ],
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Operation"
+          }
         }
       }
     },
@@ -340,6 +630,34 @@ func init() {
       "properties": {
         "user": {
           "type": "string"
+        }
+      }
+    },
+    "User": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/GormBaseModel"
+        },
+        {
+          "$ref": "#/definitions/NewUser"
+        }
+      ]
+    },
+    "UsersResponse": {
+      "required": [
+        "data"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/definitions/Paging"
+        }
+      ],
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/User"
+          }
         }
       }
     },
@@ -467,8 +785,7 @@ func init() {
     "application/json"
   ],
   "produces": [
-    "application/json",
-    "application/octet-stream"
+    "application/json"
   ],
   "schemes": [
     "http"
@@ -481,6 +798,263 @@ func init() {
   },
   "basePath": "/api",
   "paths": {
+    "/auth/from-github": {
+      "get": {
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Fetch Github Oauth URL",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "/auth/from-github/callback": {
+      "get": {
+        "security": [],
+        "parameters": [
+          {
+            "type": "string",
+            "name": "code",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "API 调用成功",
+            "schema": {
+              "$ref": "#/definitions/ActionSucceeded"
+            }
+          }
+        }
+      }
+    },
+    "/operation": {
+      "get": {
+        "parameters": [
+          {
+            "type": "integer",
+            "default": 1,
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "enum": [
+              "asc",
+              "desc"
+            ],
+            "type": "string",
+            "default": "desc",
+            "name": "order",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "default": 20,
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "order_by",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "name",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "查询 Operation 记录",
+            "schema": {
+              "$ref": "#/definitions/OperationsResponse"
+            }
+          }
+        }
+      },
+      "post": {
+        "parameters": [
+          {
+            "name": "Data",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/NewOperation"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "API 调用成功",
+            "schema": {
+              "$ref": "#/definitions/ActionSucceeded"
+            }
+          }
+        }
+      },
+      "delete": {
+        "parameters": [
+          {
+            "type": "integer",
+            "name": "id",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "API 调用成功",
+            "schema": {
+              "$ref": "#/definitions/ActionSucceeded"
+            }
+          }
+        }
+      }
+    },
+    "/user": {
+      "get": {
+        "security": [
+          {
+            "trusted": []
+          }
+        ],
+        "parameters": [
+          {
+            "type": "integer",
+            "default": 1,
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "enum": [
+              "asc",
+              "desc"
+            ],
+            "type": "string",
+            "default": "desc",
+            "name": "order",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "default": 20,
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "order_by",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "name",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "查询 User 记录",
+            "schema": {
+              "$ref": "#/definitions/UsersResponse"
+            }
+          }
+        }
+      },
+      "delete": {
+        "security": [
+          {
+            "trusted": []
+          }
+        ],
+        "parameters": [
+          {
+            "type": "integer",
+            "name": "id",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "API 调用成功",
+            "schema": {
+              "$ref": "#/definitions/ActionSucceeded"
+            }
+          }
+        }
+      }
+    },
+    "/user/fetch": {
+      "get": {
+        "parameters": [
+          {
+            "type": "integer",
+            "name": "id",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "查询 User 记录",
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          }
+        }
+      }
+    },
+    "/user/tags": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "查询 /user  所有的Tags",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "parameters": [
+          {
+            "type": "integer",
+            "name": "id",
+            "in": "query",
+            "required": true
+          },
+          {
+            "enum": [
+              "add",
+              "set"
+            ],
+            "type": "string",
+            "name": "op",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "name": "tags",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "API 调用成功",
+            "schema": {
+              "$ref": "#/definitions/ActionSucceeded"
+            }
+          }
+        }
+      }
+    },
     "/yakit/plugin": {
       "get": {
         "parameters": [
@@ -691,6 +1265,61 @@ func init() {
         }
       }
     },
+    "NewOperation": {
+      "type": "object",
+      "required": [
+        "type",
+        "trigger_user_unique_id",
+        "operation_plugin_id"
+      ],
+      "properties": {
+        "extra": {
+          "type": "string"
+        },
+        "operation_plugin_id": {
+          "type": "string"
+        },
+        "trigger_user_unique_id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      }
+    },
+    "NewUser": {
+      "type": "object",
+      "required": [
+        "uesr_unique_id",
+        "user_verbose",
+        "from_platform",
+        "trusted",
+        "tags"
+      ],
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "from_platform": {
+          "type": "string"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "trusted": {
+          "type": "boolean"
+        },
+        "uesr_unique_id": {
+          "type": "string"
+        },
+        "user_verbose": {
+          "type": "string"
+        }
+      }
+    },
     "NewYakitPlugin": {
       "type": "object",
       "required": [
@@ -699,7 +1328,6 @@ func init() {
         "authors",
         "content",
         "published_at",
-        "hash",
         "tags",
         "is_official",
         "default_open"
@@ -724,9 +1352,6 @@ func init() {
         "forks": {
           "description": "被修改的次数",
           "type": "integer"
-        },
-        "hash": {
-          "type": "string"
         },
         "is_official": {
           "type": "boolean"
@@ -756,6 +1381,34 @@ func init() {
         },
         "type": {
           "type": "string"
+        }
+      }
+    },
+    "Operation": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/GormBaseModel"
+        },
+        {
+          "$ref": "#/definitions/NewOperation"
+        }
+      ]
+    },
+    "OperationsResponse": {
+      "required": [
+        "data"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/definitions/Paging"
+        }
+      ],
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Operation"
+          }
         }
       }
     },
@@ -809,6 +1462,34 @@ func init() {
       "properties": {
         "user": {
           "type": "string"
+        }
+      }
+    },
+    "User": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/GormBaseModel"
+        },
+        {
+          "$ref": "#/definitions/NewUser"
+        }
+      ]
+    },
+    "UsersResponse": {
+      "required": [
+        "data"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/definitions/Paging"
+        }
+      ],
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/User"
+          }
         }
       }
     },

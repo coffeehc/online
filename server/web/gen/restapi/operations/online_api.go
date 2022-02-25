@@ -42,11 +42,34 @@ func NewOnlineAPI(spec *loads.Document) *OnlineAPI {
 
 		JSONConsumer: runtime.JSONConsumer(),
 
-		BinProducer:  runtime.ByteStreamProducer(),
 		JSONProducer: runtime.JSONProducer(),
 
+		DeleteOperationHandler: DeleteOperationHandlerFunc(func(params DeleteOperationParams, principal *models.Principle) middleware.Responder {
+			return middleware.NotImplemented("operation DeleteOperation has not yet been implemented")
+		}),
+		DeleteUserHandler: DeleteUserHandlerFunc(func(params DeleteUserParams, principal *models.Principle) middleware.Responder {
+			return middleware.NotImplemented("operation DeleteUser has not yet been implemented")
+		}),
 		DeleteYakitPluginHandler: DeleteYakitPluginHandlerFunc(func(params DeleteYakitPluginParams, principal *models.Principle) middleware.Responder {
 			return middleware.NotImplemented("operation DeleteYakitPlugin has not yet been implemented")
+		}),
+		GetAuthFromGithubHandler: GetAuthFromGithubHandlerFunc(func(params GetAuthFromGithubParams) middleware.Responder {
+			return middleware.NotImplemented("operation GetAuthFromGithub has not yet been implemented")
+		}),
+		GetAuthFromGithubCallbackHandler: GetAuthFromGithubCallbackHandlerFunc(func(params GetAuthFromGithubCallbackParams) middleware.Responder {
+			return middleware.NotImplemented("operation GetAuthFromGithubCallback has not yet been implemented")
+		}),
+		GetOperationHandler: GetOperationHandlerFunc(func(params GetOperationParams, principal *models.Principle) middleware.Responder {
+			return middleware.NotImplemented("operation GetOperation has not yet been implemented")
+		}),
+		GetUserHandler: GetUserHandlerFunc(func(params GetUserParams, principal *models.Principle) middleware.Responder {
+			return middleware.NotImplemented("operation GetUser has not yet been implemented")
+		}),
+		GetUserFetchHandler: GetUserFetchHandlerFunc(func(params GetUserFetchParams, principal *models.Principle) middleware.Responder {
+			return middleware.NotImplemented("operation GetUserFetch has not yet been implemented")
+		}),
+		GetUserTagsHandler: GetUserTagsHandlerFunc(func(params GetUserTagsParams, principal *models.Principle) middleware.Responder {
+			return middleware.NotImplemented("operation GetUserTags has not yet been implemented")
 		}),
 		GetYakitPluginHandler: GetYakitPluginHandlerFunc(func(params GetYakitPluginParams, principal *models.Principle) middleware.Responder {
 			return middleware.NotImplemented("operation GetYakitPlugin has not yet been implemented")
@@ -57,6 +80,12 @@ func NewOnlineAPI(spec *loads.Document) *OnlineAPI {
 		GetYakitPluginTagsHandler: GetYakitPluginTagsHandlerFunc(func(params GetYakitPluginTagsParams, principal *models.Principle) middleware.Responder {
 			return middleware.NotImplemented("operation GetYakitPluginTags has not yet been implemented")
 		}),
+		PostOperationHandler: PostOperationHandlerFunc(func(params PostOperationParams, principal *models.Principle) middleware.Responder {
+			return middleware.NotImplemented("operation PostOperation has not yet been implemented")
+		}),
+		PostUserTagsHandler: PostUserTagsHandlerFunc(func(params PostUserTagsParams, principal *models.Principle) middleware.Responder {
+			return middleware.NotImplemented("operation PostUserTags has not yet been implemented")
+		}),
 		PostYakitPluginHandler: PostYakitPluginHandlerFunc(func(params PostYakitPluginParams, principal *models.Principle) middleware.Responder {
 			return middleware.NotImplemented("operation PostYakitPlugin has not yet been implemented")
 		}),
@@ -64,6 +93,10 @@ func NewOnlineAPI(spec *loads.Document) *OnlineAPI {
 			return middleware.NotImplemented("operation PostYakitPluginTags has not yet been implemented")
 		}),
 
+		// Applies when the "Authorization" header is set
+		TrustedAuth: func(token string) (*models.Principle, error) {
+			return nil, errors.NotImplemented("api key auth (trusted) Authorization from header param [Authorization] has not yet been implemented")
+		},
 		// Applies when the "Authorization" header is set
 		UserAuth: func(token string) (*models.Principle, error) {
 			return nil, errors.NotImplemented("api key auth (user) Authorization from header param [Authorization] has not yet been implemented")
@@ -102,12 +135,13 @@ type OnlineAPI struct {
 	//   - application/json
 	JSONConsumer runtime.Consumer
 
-	// BinProducer registers a producer for the following mime types:
-	//   - application/octet-stream
-	BinProducer runtime.Producer
 	// JSONProducer registers a producer for the following mime types:
 	//   - application/json
 	JSONProducer runtime.Producer
+
+	// TrustedAuth registers a function that takes a token and returns a principal
+	// it performs authentication based on an api key Authorization provided in the header
+	TrustedAuth func(string) (*models.Principle, error)
 
 	// UserAuth registers a function that takes a token and returns a principal
 	// it performs authentication based on an api key Authorization provided in the header
@@ -116,14 +150,34 @@ type OnlineAPI struct {
 	// APIAuthorizer provides access control (ACL/RBAC/ABAC) by providing access to the request and authenticated principal
 	APIAuthorizer runtime.Authorizer
 
+	// DeleteOperationHandler sets the operation handler for the delete operation operation
+	DeleteOperationHandler DeleteOperationHandler
+	// DeleteUserHandler sets the operation handler for the delete user operation
+	DeleteUserHandler DeleteUserHandler
 	// DeleteYakitPluginHandler sets the operation handler for the delete yakit plugin operation
 	DeleteYakitPluginHandler DeleteYakitPluginHandler
+	// GetAuthFromGithubHandler sets the operation handler for the get auth from github operation
+	GetAuthFromGithubHandler GetAuthFromGithubHandler
+	// GetAuthFromGithubCallbackHandler sets the operation handler for the get auth from github callback operation
+	GetAuthFromGithubCallbackHandler GetAuthFromGithubCallbackHandler
+	// GetOperationHandler sets the operation handler for the get operation operation
+	GetOperationHandler GetOperationHandler
+	// GetUserHandler sets the operation handler for the get user operation
+	GetUserHandler GetUserHandler
+	// GetUserFetchHandler sets the operation handler for the get user fetch operation
+	GetUserFetchHandler GetUserFetchHandler
+	// GetUserTagsHandler sets the operation handler for the get user tags operation
+	GetUserTagsHandler GetUserTagsHandler
 	// GetYakitPluginHandler sets the operation handler for the get yakit plugin operation
 	GetYakitPluginHandler GetYakitPluginHandler
 	// GetYakitPluginFetchHandler sets the operation handler for the get yakit plugin fetch operation
 	GetYakitPluginFetchHandler GetYakitPluginFetchHandler
 	// GetYakitPluginTagsHandler sets the operation handler for the get yakit plugin tags operation
 	GetYakitPluginTagsHandler GetYakitPluginTagsHandler
+	// PostOperationHandler sets the operation handler for the post operation operation
+	PostOperationHandler PostOperationHandler
+	// PostUserTagsHandler sets the operation handler for the post user tags operation
+	PostUserTagsHandler PostUserTagsHandler
 	// PostYakitPluginHandler sets the operation handler for the post yakit plugin operation
 	PostYakitPluginHandler PostYakitPluginHandler
 	// PostYakitPluginTagsHandler sets the operation handler for the post yakit plugin tags operation
@@ -201,19 +255,43 @@ func (o *OnlineAPI) Validate() error {
 		unregistered = append(unregistered, "JSONConsumer")
 	}
 
-	if o.BinProducer == nil {
-		unregistered = append(unregistered, "BinProducer")
-	}
 	if o.JSONProducer == nil {
 		unregistered = append(unregistered, "JSONProducer")
 	}
 
+	if o.TrustedAuth == nil {
+		unregistered = append(unregistered, "AuthorizationAuth")
+	}
 	if o.UserAuth == nil {
 		unregistered = append(unregistered, "AuthorizationAuth")
 	}
 
+	if o.DeleteOperationHandler == nil {
+		unregistered = append(unregistered, "DeleteOperationHandler")
+	}
+	if o.DeleteUserHandler == nil {
+		unregistered = append(unregistered, "DeleteUserHandler")
+	}
 	if o.DeleteYakitPluginHandler == nil {
 		unregistered = append(unregistered, "DeleteYakitPluginHandler")
+	}
+	if o.GetAuthFromGithubHandler == nil {
+		unregistered = append(unregistered, "GetAuthFromGithubHandler")
+	}
+	if o.GetAuthFromGithubCallbackHandler == nil {
+		unregistered = append(unregistered, "GetAuthFromGithubCallbackHandler")
+	}
+	if o.GetOperationHandler == nil {
+		unregistered = append(unregistered, "GetOperationHandler")
+	}
+	if o.GetUserHandler == nil {
+		unregistered = append(unregistered, "GetUserHandler")
+	}
+	if o.GetUserFetchHandler == nil {
+		unregistered = append(unregistered, "GetUserFetchHandler")
+	}
+	if o.GetUserTagsHandler == nil {
+		unregistered = append(unregistered, "GetUserTagsHandler")
 	}
 	if o.GetYakitPluginHandler == nil {
 		unregistered = append(unregistered, "GetYakitPluginHandler")
@@ -223,6 +301,12 @@ func (o *OnlineAPI) Validate() error {
 	}
 	if o.GetYakitPluginTagsHandler == nil {
 		unregistered = append(unregistered, "GetYakitPluginTagsHandler")
+	}
+	if o.PostOperationHandler == nil {
+		unregistered = append(unregistered, "PostOperationHandler")
+	}
+	if o.PostUserTagsHandler == nil {
+		unregistered = append(unregistered, "PostUserTagsHandler")
 	}
 	if o.PostYakitPluginHandler == nil {
 		unregistered = append(unregistered, "PostYakitPluginHandler")
@@ -248,6 +332,12 @@ func (o *OnlineAPI) AuthenticatorsFor(schemes map[string]spec.SecurityScheme) ma
 	result := make(map[string]runtime.Authenticator)
 	for name := range schemes {
 		switch name {
+		case "trusted":
+			scheme := schemes[name]
+			result[name] = o.APIKeyAuthenticator(scheme.Name, scheme.In, func(token string) (interface{}, error) {
+				return o.TrustedAuth(token)
+			})
+
 		case "user":
 			scheme := schemes[name]
 			result[name] = o.APIKeyAuthenticator(scheme.Name, scheme.In, func(token string) (interface{}, error) {
@@ -287,8 +377,6 @@ func (o *OnlineAPI) ProducersFor(mediaTypes []string) map[string]runtime.Produce
 	result := make(map[string]runtime.Producer, len(mediaTypes))
 	for _, mt := range mediaTypes {
 		switch mt {
-		case "application/octet-stream":
-			result["application/octet-stream"] = o.BinProducer
 		case "application/json":
 			result["application/json"] = o.JSONProducer
 		}
@@ -334,7 +422,39 @@ func (o *OnlineAPI) initHandlerCache() {
 	if o.handlers["DELETE"] == nil {
 		o.handlers["DELETE"] = make(map[string]http.Handler)
 	}
+	o.handlers["DELETE"]["/operation"] = NewDeleteOperation(o.context, o.DeleteOperationHandler)
+	if o.handlers["DELETE"] == nil {
+		o.handlers["DELETE"] = make(map[string]http.Handler)
+	}
+	o.handlers["DELETE"]["/user"] = NewDeleteUser(o.context, o.DeleteUserHandler)
+	if o.handlers["DELETE"] == nil {
+		o.handlers["DELETE"] = make(map[string]http.Handler)
+	}
 	o.handlers["DELETE"]["/yakit/plugin"] = NewDeleteYakitPlugin(o.context, o.DeleteYakitPluginHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/auth/from-github"] = NewGetAuthFromGithub(o.context, o.GetAuthFromGithubHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/auth/from-github/callback"] = NewGetAuthFromGithubCallback(o.context, o.GetAuthFromGithubCallbackHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/operation"] = NewGetOperation(o.context, o.GetOperationHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/user"] = NewGetUser(o.context, o.GetUserHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/user/fetch"] = NewGetUserFetch(o.context, o.GetUserFetchHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/user/tags"] = NewGetUserTags(o.context, o.GetUserTagsHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
@@ -347,6 +467,14 @@ func (o *OnlineAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/yakit/plugin/tags"] = NewGetYakitPluginTags(o.context, o.GetYakitPluginTagsHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/operation"] = NewPostOperation(o.context, o.PostOperationHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/user/tags"] = NewPostUserTags(o.context, o.PostUserTagsHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}

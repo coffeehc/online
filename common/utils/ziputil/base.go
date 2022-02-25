@@ -3,9 +3,9 @@ package ziputil
 import (
 	"archive/zip"
 	"io"
-	"os"
 	"online/common/log"
 	"online/common/utils"
+	"os"
 	"path/filepath"
 )
 

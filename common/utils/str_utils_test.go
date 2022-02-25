@@ -82,7 +82,7 @@ func TestSliceGroup(t *testing.T) {
 }
 
 func TestGetFirstIPFromHostWithTimeout(t *testing.T) {
-	ip := GetFirstIPFromHostWithTimeout(5 * time.Second, "baidu.com", nil)
+	ip := GetFirstIPFromHostWithTimeout(5*time.Second, "baidu.com", nil)
 	spew.Dump(ip)
 }
 

@@ -6,9 +6,9 @@ import (
 	"fmt"
 	uuid "github.com/satori/go.uuid"
 	"io/ioutil"
+	"online/common/utils"
 	"os"
 	"os/exec"
-	"online/common/utils"
 	"path/filepath"
 	"time"
 )

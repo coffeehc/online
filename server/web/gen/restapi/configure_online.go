@@ -36,9 +36,14 @@ func configureAPI(api *operations.OnlineAPI) http.Handler {
 
 	api.JSONConsumer = runtime.JSONConsumer()
 
-	api.BinProducer = runtime.ByteStreamProducer()
 	api.JSONProducer = runtime.JSONProducer()
 
+	// Applies when the "Authorization" header is set
+	if api.TrustedAuth == nil {
+		api.TrustedAuth = func(token string) (*models.Principle, error) {
+			return nil, errors.NotImplemented("api key auth (trusted) Authorization from header param [Authorization] has not yet been implemented")
+		}
+	}
 	// Applies when the "Authorization" header is set
 	if api.UserAuth == nil {
 		api.UserAuth = func(token string) (*models.Principle, error) {
@@ -52,9 +57,49 @@ func configureAPI(api *operations.OnlineAPI) http.Handler {
 	// Example:
 	// api.APIAuthorizer = security.Authorized()
 
+	if api.DeleteOperationHandler == nil {
+		api.DeleteOperationHandler = operations.DeleteOperationHandlerFunc(func(params operations.DeleteOperationParams, principal *models.Principle) middleware.Responder {
+			return middleware.NotImplemented("operation operations.DeleteOperation has not yet been implemented")
+		})
+	}
+	if api.DeleteUserHandler == nil {
+		api.DeleteUserHandler = operations.DeleteUserHandlerFunc(func(params operations.DeleteUserParams, principal *models.Principle) middleware.Responder {
+			return middleware.NotImplemented("operation operations.DeleteUser has not yet been implemented")
+		})
+	}
 	if api.DeleteYakitPluginHandler == nil {
 		api.DeleteYakitPluginHandler = operations.DeleteYakitPluginHandlerFunc(func(params operations.DeleteYakitPluginParams, principal *models.Principle) middleware.Responder {
 			return middleware.NotImplemented("operation operations.DeleteYakitPlugin has not yet been implemented")
+		})
+	}
+	if api.GetAuthFromGithubHandler == nil {
+		api.GetAuthFromGithubHandler = operations.GetAuthFromGithubHandlerFunc(func(params operations.GetAuthFromGithubParams) middleware.Responder {
+			return middleware.NotImplemented("operation operations.GetAuthFromGithub has not yet been implemented")
+		})
+	}
+	if api.GetAuthFromGithubCallbackHandler == nil {
+		api.GetAuthFromGithubCallbackHandler = operations.GetAuthFromGithubCallbackHandlerFunc(func(params operations.GetAuthFromGithubCallbackParams) middleware.Responder {
+			return middleware.NotImplemented("operation operations.GetAuthFromGithubCallback has not yet been implemented")
+		})
+	}
+	if api.GetOperationHandler == nil {
+		api.GetOperationHandler = operations.GetOperationHandlerFunc(func(params operations.GetOperationParams, principal *models.Principle) middleware.Responder {
+			return middleware.NotImplemented("operation operations.GetOperation has not yet been implemented")
+		})
+	}
+	if api.GetUserHandler == nil {
+		api.GetUserHandler = operations.GetUserHandlerFunc(func(params operations.GetUserParams, principal *models.Principle) middleware.Responder {
+			return middleware.NotImplemented("operation operations.GetUser has not yet been implemented")
+		})
+	}
+	if api.GetUserFetchHandler == nil {
+		api.GetUserFetchHandler = operations.GetUserFetchHandlerFunc(func(params operations.GetUserFetchParams, principal *models.Principle) middleware.Responder {
+			return middleware.NotImplemented("operation operations.GetUserFetch has not yet been implemented")
+		})
+	}
+	if api.GetUserTagsHandler == nil {
+		api.GetUserTagsHandler = operations.GetUserTagsHandlerFunc(func(params operations.GetUserTagsParams, principal *models.Principle) middleware.Responder {
+			return middleware.NotImplemented("operation operations.GetUserTags has not yet been implemented")
 		})
 	}
 	if api.GetYakitPluginHandler == nil {
@@ -70,6 +115,16 @@ func configureAPI(api *operations.OnlineAPI) http.Handler {
 	if api.GetYakitPluginTagsHandler == nil {
 		api.GetYakitPluginTagsHandler = operations.GetYakitPluginTagsHandlerFunc(func(params operations.GetYakitPluginTagsParams, principal *models.Principle) middleware.Responder {
 			return middleware.NotImplemented("operation operations.GetYakitPluginTags has not yet been implemented")
+		})
+	}
+	if api.PostOperationHandler == nil {
+		api.PostOperationHandler = operations.PostOperationHandlerFunc(func(params operations.PostOperationParams, principal *models.Principle) middleware.Responder {
+			return middleware.NotImplemented("operation operations.PostOperation has not yet been implemented")
+		})
+	}
+	if api.PostUserTagsHandler == nil {
+		api.PostUserTagsHandler = operations.PostUserTagsHandlerFunc(func(params operations.PostUserTagsParams, principal *models.Principle) middleware.Responder {
+			return middleware.NotImplemented("operation operations.PostUserTags has not yet been implemented")
 		})
 	}
 	if api.PostYakitPluginHandler == nil {
