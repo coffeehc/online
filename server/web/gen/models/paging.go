@@ -48,8 +48,6 @@ func (m *Paging) validatePagemeta(formats strfmt.Registry) error {
 		if err := m.Pagemeta.Validate(formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("pagemeta")
-			} else if ce, ok := err.(*errors.CompositeError); ok {
-				return ce.ValidateName("pagemeta")
 			}
 			return err
 		}
@@ -78,8 +76,6 @@ func (m *Paging) contextValidatePagemeta(ctx context.Context, formats strfmt.Reg
 		if err := m.Pagemeta.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("pagemeta")
-			} else if ce, ok := err.(*errors.CompositeError); ok {
-				return ce.ValidateName("pagemeta")
 			}
 			return err
 		}

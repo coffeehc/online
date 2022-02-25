@@ -28,7 +28,7 @@ securityDefinitions:
     name: Authorization
 
 security:
-  - user: []
+  - user: [ ]
 
 paths:
   /yakit/plugin/fetch:
@@ -154,13 +154,74 @@ definitions:
     allOf:
       - $ref: "#/definitions/GormBaseModel"
       - $ref: "#/definitions/NewYakitPlugin"
+  YakitPluginParam:
+    type: object
+    required:
+      - field
+    properties:
+      field:
+        type: string
+      default_value:
+        type: string
+      type_verbose:
+        type: string
+      field_verbose:
+        type: string
+      help:
+        type: string
+      required:
+        type: boolean
+      group:
+        type: string
   NewYakitPlugin:
     type: object
     required:
-      - name
+      - type
+      - script_name
+      - authors
+      - content
+      - published_at
+      - hash
+      - tags
+      - is_official
+      - default_open
     properties:
-      name:
+      default_open:
+        type: boolean
+      is_official:
+        type: boolean
+      tags:
+        type: array
+        items:
+          type: string
+      hash:
         type: string
+      params:
+        type: array
+        items:
+          $ref: "#/definitions/YakitPluginParam"
+      type:
+        type: string
+      script_name:
+        type: string
+      authors:
+        type: array
+        items:
+          type: string
+      content:
+        type: string
+      published_at:
+        type: integer
+        description: "插件发布的时间"
+      downloaded_total:
+        type: integer
+        description: "下载次数"
+      stars:
+        type: integer
+        description: "获得推荐的次数"
+      forks:
+        type: integer
+        description: "被修改的次数"
   Paging:
     type: object
     required:

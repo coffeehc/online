@@ -7,6 +7,7 @@ package models
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
@@ -19,16 +20,96 @@ import (
 // swagger:model NewYakitPlugin
 type NewYakitPlugin struct {
 
-	// name
+	// authors
 	// Required: true
-	Name *string `json:"name"`
+	Authors []string `json:"authors"`
+
+	// content
+	// Required: true
+	Content *string `json:"content"`
+
+	// default open
+	// Required: true
+	DefaultOpen *bool `json:"default_open"`
+
+	// 下载次数
+	DownloadedTotal int64 `json:"downloaded_total,omitempty"`
+
+	// 被修改的次数
+	Forks int64 `json:"forks,omitempty"`
+
+	// hash
+	// Required: true
+	Hash *string `json:"hash"`
+
+	// is official
+	// Required: true
+	IsOfficial *bool `json:"is_official"`
+
+	// params
+	Params []*YakitPluginParam `json:"params"`
+
+	// 插件发布的时间
+	// Required: true
+	PublishedAt *int64 `json:"published_at"`
+
+	// script name
+	// Required: true
+	ScriptName *string `json:"script_name"`
+
+	// 获得推荐的次数
+	Stars int64 `json:"stars,omitempty"`
+
+	// tags
+	// Required: true
+	Tags []string `json:"tags"`
+
+	// type
+	// Required: true
+	Type *string `json:"type"`
 }
 
 // Validate validates this new yakit plugin
 func (m *NewYakitPlugin) Validate(formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.validateName(formats); err != nil {
+	if err := m.validateAuthors(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateContent(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateDefaultOpen(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateHash(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateIsOfficial(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateParams(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validatePublishedAt(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateScriptName(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateTags(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateType(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -38,17 +119,140 @@ func (m *NewYakitPlugin) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *NewYakitPlugin) validateName(formats strfmt.Registry) error {
+func (m *NewYakitPlugin) validateAuthors(formats strfmt.Registry) error {
 
-	if err := validate.Required("name", "body", m.Name); err != nil {
+	if err := validate.Required("authors", "body", m.Authors); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-// ContextValidate validates this new yakit plugin based on context it is used
+func (m *NewYakitPlugin) validateContent(formats strfmt.Registry) error {
+
+	if err := validate.Required("content", "body", m.Content); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *NewYakitPlugin) validateDefaultOpen(formats strfmt.Registry) error {
+
+	if err := validate.Required("default_open", "body", m.DefaultOpen); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *NewYakitPlugin) validateHash(formats strfmt.Registry) error {
+
+	if err := validate.Required("hash", "body", m.Hash); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *NewYakitPlugin) validateIsOfficial(formats strfmt.Registry) error {
+
+	if err := validate.Required("is_official", "body", m.IsOfficial); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *NewYakitPlugin) validateParams(formats strfmt.Registry) error {
+	if swag.IsZero(m.Params) { // not required
+		return nil
+	}
+
+	for i := 0; i < len(m.Params); i++ {
+		if swag.IsZero(m.Params[i]) { // not required
+			continue
+		}
+
+		if m.Params[i] != nil {
+			if err := m.Params[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("params" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
+	return nil
+}
+
+func (m *NewYakitPlugin) validatePublishedAt(formats strfmt.Registry) error {
+
+	if err := validate.Required("published_at", "body", m.PublishedAt); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *NewYakitPlugin) validateScriptName(formats strfmt.Registry) error {
+
+	if err := validate.Required("script_name", "body", m.ScriptName); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *NewYakitPlugin) validateTags(formats strfmt.Registry) error {
+
+	if err := validate.Required("tags", "body", m.Tags); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *NewYakitPlugin) validateType(formats strfmt.Registry) error {
+
+	if err := validate.Required("type", "body", m.Type); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// ContextValidate validate this new yakit plugin based on the context it is used
 func (m *NewYakitPlugin) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateParams(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *NewYakitPlugin) contextValidateParams(ctx context.Context, formats strfmt.Registry) error {
+
+	for i := 0; i < len(m.Params); i++ {
+
+		if m.Params[i] != nil {
+			if err := m.Params[i].ContextValidate(ctx, formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("params" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
 	return nil
 }
 

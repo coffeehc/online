@@ -225,10 +225,67 @@ func init() {
     "NewYakitPlugin": {
       "type": "object",
       "required": [
-        "name"
+        "type",
+        "script_name",
+        "authors",
+        "content",
+        "published_at",
+        "hash",
+        "tags",
+        "is_official",
+        "default_open"
       ],
       "properties": {
-        "name": {
+        "authors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "content": {
+          "type": "string"
+        },
+        "default_open": {
+          "type": "boolean"
+        },
+        "downloaded_total": {
+          "description": "下载次数",
+          "type": "integer"
+        },
+        "forks": {
+          "description": "被修改的次数",
+          "type": "integer"
+        },
+        "hash": {
+          "type": "string"
+        },
+        "is_official": {
+          "type": "boolean"
+        },
+        "params": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/YakitPluginParam"
+          }
+        },
+        "published_at": {
+          "description": "插件发布的时间",
+          "type": "integer"
+        },
+        "script_name": {
+          "type": "string"
+        },
+        "stars": {
+          "description": "获得推荐的次数",
+          "type": "integer"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "type": {
           "type": "string"
         }
       }
@@ -295,6 +352,35 @@ func init() {
           "$ref": "#/definitions/NewYakitPlugin"
         }
       ]
+    },
+    "YakitPluginParam": {
+      "type": "object",
+      "required": [
+        "field"
+      ],
+      "properties": {
+        "default_value": {
+          "type": "string"
+        },
+        "field": {
+          "type": "string"
+        },
+        "field_verbose": {
+          "type": "string"
+        },
+        "group": {
+          "type": "string"
+        },
+        "help": {
+          "type": "string"
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "type_verbose": {
+          "type": "string"
+        }
+      }
     },
     "YakitPluginsResponse": {
       "required": [
@@ -608,10 +694,67 @@ func init() {
     "NewYakitPlugin": {
       "type": "object",
       "required": [
-        "name"
+        "type",
+        "script_name",
+        "authors",
+        "content",
+        "published_at",
+        "hash",
+        "tags",
+        "is_official",
+        "default_open"
       ],
       "properties": {
-        "name": {
+        "authors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "content": {
+          "type": "string"
+        },
+        "default_open": {
+          "type": "boolean"
+        },
+        "downloaded_total": {
+          "description": "下载次数",
+          "type": "integer"
+        },
+        "forks": {
+          "description": "被修改的次数",
+          "type": "integer"
+        },
+        "hash": {
+          "type": "string"
+        },
+        "is_official": {
+          "type": "boolean"
+        },
+        "params": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/YakitPluginParam"
+          }
+        },
+        "published_at": {
+          "description": "插件发布的时间",
+          "type": "integer"
+        },
+        "script_name": {
+          "type": "string"
+        },
+        "stars": {
+          "description": "获得推荐的次数",
+          "type": "integer"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "type": {
           "type": "string"
         }
       }
@@ -678,6 +821,35 @@ func init() {
           "$ref": "#/definitions/NewYakitPlugin"
         }
       ]
+    },
+    "YakitPluginParam": {
+      "type": "object",
+      "required": [
+        "field"
+      ],
+      "properties": {
+        "default_value": {
+          "type": "string"
+        },
+        "field": {
+          "type": "string"
+        },
+        "field_verbose": {
+          "type": "string"
+        },
+        "group": {
+          "type": "string"
+        },
+        "help": {
+          "type": "string"
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "type_verbose": {
+          "type": "string"
+        }
+      }
     },
     "YakitPluginsResponse": {
       "required": [
